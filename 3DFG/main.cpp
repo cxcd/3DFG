@@ -61,6 +61,7 @@ InputMode currInMode = InputMode::Func;
 std::string inputStr;
 bool inputtingStr = false;
 int textIndex = 0;
+bool holdingModKey = false;
 
 // Animation
 bool animating = false;
@@ -140,6 +141,24 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 			orbitCamera = true;
 		}
 	}
+
+	// Get clipboard
+	if (key == GLFW_KEY_LEFT_CONTROL && action == GLFW_PRESS) {
+		holdingModKey = true;
+	}
+	if (key == GLFW_KEY_LEFT_CONTROL && action == GLFW_RELEASE) {
+		holdingModKey = false;
+	}
+	if (key == GLFW_KEY_V && action == GLFW_PRESS && inputtingStr) {
+		std::string clipboard = glfwGetClipboardString(window);
+		if (textIndex == inputStr.length()) {
+			inputStr += clipboard;
+		} else {
+			inputStr.insert(textIndex, clipboard);
+		}
+		textIndex += clipboard.length();
+	}
+
 	// Increment text insert index
 	if (key == GLFW_KEY_LEFT && (action == GLFW_PRESS || action == GLFW_REPEAT) && inputtingStr) {
 		textIndex--;
@@ -147,6 +166,7 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 			textIndex = 0;
 		}
 	}
+
 	// Decrement text insert index
 	if (key == GLFW_KEY_RIGHT && (action == GLFW_PRESS || action == GLFW_REPEAT) && inputtingStr) {
 		textIndex++;
@@ -154,27 +174,31 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 			textIndex = inputStr.length();
 		}
 	}
+
 	//Enter a function
 	if (key == GLFW_KEY_I && action == GLFW_RELEASE && !inputtingStr) {
 		currInMode = InputMode::Func;
 		inputtingStr = true;
-
 	}
+
 	//Enter the x range
 	if (key == GLFW_KEY_X && action == GLFW_RELEASE && !inputtingStr) {
 		currInMode = InputMode::RangeX;
 		inputtingStr = true;
 	}
+
 	//Enter the y range
 	if (key == GLFW_KEY_Y && action == GLFW_RELEASE && !inputtingStr) {
 		currInMode = InputMode::RangeY;
 		inputtingStr = true;
 	}
+
 	//Enter the z range
 	if (key == GLFW_KEY_Z && action == GLFW_RELEASE && !inputtingStr) {
 		currInMode = InputMode::RangeZ;
 		inputtingStr = true;
 	}
+
 	// Delete from end of input string
 	if (key == GLFW_KEY_BACKSPACE && (action == GLFW_PRESS || action == GLFW_REPEAT) && inputtingStr) {
 		if (!inputStr.empty()) {
@@ -189,6 +213,7 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 			}
 		}
 	}
+
 	// Send command
 	if (key == GLFW_KEY_ENTER && action == GLFW_PRESS && inputtingStr) {
 		if (!inputStr.empty()) {
@@ -228,7 +253,6 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 				animAcc = 0;
 				animating = true;
 			}
-
 		}
 		// Clear input
 		inputStr = "";
