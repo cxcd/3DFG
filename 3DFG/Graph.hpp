@@ -9,7 +9,7 @@
 // STD
 #include <vector>
 // User
-#include "expressionutil.hpp"
+#include "exprutil.hpp"
 
 class Graph {
 private:
@@ -17,11 +17,11 @@ private:
 	GLuint height1ID, height2ID;
 	std::vector<GLfloat> vertices;
 	std::vector<GLuint> indices;
-	glm::vec2 rangeX = glm::vec2(-1.0f, 1.0f);
-	glm::vec2 rangeY = glm::vec2(-1.0f, 1.0f);
-	glm::vec2 rangeZ = glm::vec2(-1.0f, 1.0f);
+	glm::vec2 rangeX = glm::vec2(-5.0f, 5.0f);
+	glm::vec2 rangeY = glm::vec2(-5.0f, 5.0f);
+	glm::vec2 rangeZ = glm::vec2(-5.0f, 5.0f);
 	std::vector<GLfloat> heights;
-	ExpressionUtil::ExpressionFloat expression;
+	ExprUtil::ExprFloat expression;
 	int res = 0;
 public:
 	bool height1Set = false;
@@ -36,10 +36,16 @@ public:
 	bool setExpression(std::string expr);
 	// Set X range
 	void setRangeX(glm::vec2 range);
+	// Get X range
+	glm::vec2 getRangeX();
 	// Set Y range
 	void setRangeY(glm::vec2 range);
+	// Get Y range
+	glm::vec2 getRangeY();
 	// Set Z range
 	void setRangeZ(glm::vec2 range);
+	// Get Z range
+	glm::vec2 getRangeZ();
 };
 
 #endif

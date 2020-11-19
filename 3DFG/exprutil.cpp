@@ -1,6 +1,6 @@
-#include "expressionutil.hpp"
+#include "exprutil.hpp"
 
-namespace ExpressionUtil {
+namespace ExprUtil {
 
 	// Peek next token, bounds check
 	template<typename T>
@@ -29,7 +29,8 @@ namespace ExpressionUtil {
 			}
 			// Mandate syntax
 			if (peek() != Token::ClosedP) {
-				throw std::runtime_error("ERROR::EXPRESSIONUTIL: Open parenthesis has no matching closed parenthesis.");;
+				// TODO this isnt invalidating the isValid function
+				throw std::runtime_error("ERROR::EXPRUTIL: Open parenthesis has no matching closed parenthesis.");;
 			}
 			// Consume RParens
 			++indexTok;
@@ -52,23 +53,28 @@ namespace ExpressionUtil {
 			++indexTok;
 			// Check if it is a variable or a function name
 			if (peek() == Token::OpenP) {
-				// This is a function, execute assiciated function
-				value = funcMap[strings[indexStr++]](parseValue());
+				// If this is a function, execute associated function
+				typename std::unordered_map<std::string, FnPtr>::iterator iterF = funcMap.find(strings[indexStr++]);
+				if (iterF == funcMap.end()) {
+					throw std::runtime_error("ERROR::EXPRUTIL: Function " + strings[indexStr - 1] + " does not exist.");
+				} else {
+					value = iterF->second(parseValue());
+				}
 			} else {
 				// This is a variable, if there actually are variables
 				if (!variables.empty()) {
-					typename std::unordered_map<std::string, T>::iterator iter = variables.find(strings[indexStr]);
-					if (iter != variables.end()) {
+					typename std::unordered_map<std::string, T>::iterator iterV = variables.find(strings[indexStr]);
+					if (iterV != variables.end()) {
 						// Found, get associated value
-						value = iter->second;
+						value = iterV->second;
 						++indexStr;
 					} else {
 						// Map has variables but this one wasn't provided
-						throw std::runtime_error("ERROR::EXPRESSIONUTIL: A variable wasn't initialized.");
+						throw std::runtime_error("ERROR::EXPRUTIL: A variable wasn't initialized.");
 					}
 				} else {
 					// Variable map is empty
-					throw std::runtime_error("ERROR::EXPRESSIONUTIL: No variables provided or function is missing parenthesis.");
+					throw std::runtime_error("ERROR::EXPRUTIL: No variables provided or function is missing parenthesis.");
 				}
 			}
 		} else {
@@ -231,7 +237,7 @@ namespace ExpressionUtil {
 						i++;
 						// Error checking for non-digits or stray decimal separator
 						if (!isdigit(input[i])) {
-							throw std::runtime_error("ERROR::EXPRESSIONUTIL: Value following decimal separator is not a digit.");;
+							throw std::runtime_error("ERROR::EXPRUTIL: Value following decimal separator is not a digit.");;
 						}
 						// Get the value after the decimal separator
 						while (isdigit(input[i])) {
@@ -241,7 +247,7 @@ namespace ExpressionUtil {
 							++length;
 						}
 					} else if (isalpha(input[i])) {
-						throw std::runtime_error("ERROR::EXPRESSIONUTIL: Value following number is a letter. Multiplication must be explicit.");
+						throw std::runtime_error("ERROR::EXPRUTIL: Value following number is a letter. Multiplication must be explicit.");
 					}
 					if (fractional > 0) {
 						literalResult = literalResult + (fractional / std::pow(10, length));
@@ -288,7 +294,7 @@ namespace ExpressionUtil {
 		T result = 0;
 		try {
 			result = parseExpression();
-		} catch (std::exception& e) {
+		} catch (std::runtime_error& e) {
 			std::cout << e.what() << "\n";
 		}
 		return result;
@@ -304,7 +310,7 @@ namespace ExpressionUtil {
 		T result = 0;
 		try {
 			result = parseExpression();
-		} catch (std::exception& e) {
+		} catch (std::runtime_error& e) {
 			std::cout << e.what() << "\n";
 			return false;
 		}
@@ -316,7 +322,7 @@ namespace ExpressionUtil {
 	Expression<T>::Expression() {}
 
 	// Constructor that sets expression
-	// e.g. ExpressionUtil::ExpressionFloat expr("x^2/sin(2*pi/y))-x/2");
+	// e.g. ExprUtil::ExpressionFloat expr("x^2/sin(2*pi/y))-x/2");
 	template <typename T>
 	Expression<T>::Expression(std::string expression) {
 		set(expression);

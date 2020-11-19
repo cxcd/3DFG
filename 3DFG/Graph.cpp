@@ -134,17 +134,31 @@ bool Graph::setExpression(std::string expr) {
 	return true;
 }
 
+
 // Set X range
 void Graph::setRangeX(glm::vec2 range) {
 	rangeX = range;
 }
+// Get X range
+glm::vec2 Graph::getRangeX() {
+	return rangeX;
+}
+
 
 // Set Y range
 void Graph::setRangeY(glm::vec2 range) {
 	rangeZ = range;
 }
+// Get Y range
+glm::vec2 Graph::getRangeY() {
+	return rangeY;
+}
 
 // Set Z range
 void Graph::setRangeZ(glm::vec2 range) {
 	rangeY = range;
+}
+// Get Z range
+glm::vec2 Graph::getRangeZ() {
+	return rangeZ;
 }

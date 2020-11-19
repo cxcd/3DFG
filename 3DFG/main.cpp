@@ -72,6 +72,9 @@ int changingExpr = 0;
 Shader textShader;
 Text text;
 
+// Axes label toggle
+bool showAxesLabels = true;
+
 // Utility
 
 template <typename T>
@@ -86,8 +89,13 @@ T clip(const T& n, const T& lower, const T& upper) {
 
 template <typename T>
 T smoothstep(T edge0, T edge1, T x) {
-	x = clip((x - edge0) / (edge1 - edge0), 0.0, 1.0);
+	x = clip((x - edge0) / (edge1 - edge0), (T)0, (T)1);
 	return x * x * (3 - 2 * x);
+}
+
+template <typename T>
+T mapRange(T value, T oldMin, T oldMax, T newMin, T newMax) {
+	return (value - oldMin) / (oldMax - oldMin) * (newMax - newMin) + newMin;
 }
 
 // Callbacks
@@ -101,7 +109,7 @@ void reshape(GLFWwindow* window, int w, int h) {
 }
 
 void errorCallback(int error, const char* description) {
-	std::cerr << "Error: " << description << "\n";
+	std::cerr << "ERROR::3DFG: " << description << "\n";
 }
 
 void cursorPosition(GLFWwindow* window, double x, double y) {
@@ -135,6 +143,12 @@ void charCallback(GLFWwindow* window, unsigned int codepoint) {
 
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+	
+	// Toggle axes labels
+	if (key == GLFW_KEY_L && action == GLFW_PRESS) {
+		showAxesLabels = !showAxesLabels;
+	}
+
 	// Restart camera orbit
 	if (key == GLFW_KEY_R && action == GLFW_PRESS) {
 		if (!inputtingStr) {
@@ -230,11 +244,11 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 				std::istringstream ss(inputStr);
 				glm::vec2 range;
 				std::string temp;
-				// Get number pair
+				// Get number pair from input string as float, clip range
 				getline(ss, temp, ',');
-				range.x = std::stof(temp);
+				range.x = clip(std::stof(temp), -1000.0f, 1000.0f);
 				getline(ss, temp, '\n');
-				range.y = std::stof(temp);
+				range.y = clip(std::stof(temp), -1000.0f, 1000.0f);
 				// Send to the given range
 				switch (currInMode) {
 				case InputMode::RangeX:
@@ -350,10 +364,17 @@ void display() {
 	glm::vec4 posX = cam.viewMatrix * glm::vec4(0.5f, -0.5f, -0.5f, 1.0f);
 	glm::vec4 posY = cam.viewMatrix * glm::vec4(-0.5f, -0.5f, 0.5f, 1.0f);
 	glm::vec4 posZ = cam.viewMatrix * glm::vec4(-0.5f, 0.5f, -0.5f, 1.0f);
+	float distZLabel = mapRange(glm::distance(cam.position, glm::vec3(-0.5f, 0.5f, -0.5f)), 0.5f, 1.5f, 0.0f, 1.0f);
 	text.render(textShader, "o", posO.x, posO.y, 0.0014f, glm::vec4(0.0f, 0.0f, 0.0f, 0.5f));
 	text.render(textShader, "x", posX.x, posX.y, 0.0014f, glm::vec4(1.0f, 0.0f, 0.0f, 0.5f));
 	text.render(textShader, "y", posY.x, posY.y, 0.0014f, glm::vec4(0.0f, 1.0f, 0.0f, 0.5f));
-	text.render(textShader, "z", posZ.x, posZ.y, 0.0014f, glm::vec4(0.0f, 0.0f, 1.0f, 0.5f));
+	text.render(textShader, "z", posZ.x, posZ.y, 0.0014f, glm::vec4(0.0f, 0.0f, 1.0f, smoothstep(0.0f, 0.5f, distZLabel)));
+	// Axes range labels
+	if (showAxesLabels) {
+		text.render(textShader, "x : { " + std::to_string(graph.getRangeX().x) + ", " + std::to_string(graph.getRangeX().y) + " }", -0.92f, 0.9f, 0.0007f, glm::vec4(0.5f, 0.0f, 0.7f, 1.0f));
+		text.render(textShader, "y : { " + std::to_string(graph.getRangeY().x) + ", " + std::to_string(graph.getRangeY().y) + " }", -0.92f, 0.85f, 0.0007f, glm::vec4(0.5f, 0.0f, 0.7f, 1.0f));
+		text.render(textShader, "z : { " + std::to_string(graph.getRangeZ().x) + ", " + std::to_string(graph.getRangeZ().y) + " }", -0.92f, 0.8f, 0.0007f, glm::vec4(0.5f, 0.0f, 0.7f, 1.0f));
+	}
 }
 
 // Setup

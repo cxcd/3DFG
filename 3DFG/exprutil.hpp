@@ -1,5 +1,5 @@
-#ifndef EXPRESSIONUTIL_H
-#define EXPRESSIONUTIL_H
+#ifndef EXPRUTIL_H
+#define EXPRUTIL_H
 
 #include <iostream>
 #include <string>
@@ -8,7 +8,7 @@
 #include <sstream>
 #include <unordered_map>
 
-namespace ExpressionUtil {
+namespace ExprUtil {
 
 	template <typename T>
 	class Expression {
@@ -77,24 +77,24 @@ namespace ExpressionUtil {
 
 	public:
 		// Associate a variable with a value
-		// e.g. expr.variables["x"] = 4;
+		// e.g. myExpr.variables["x"] = 4;
 		std::unordered_map<std::string, T> variables = { {"pi", pi} };
 		// Set expression
 		void set(std::string expression);
 		// Solve expression
 		T solve();
-		// Check if the function is valid
+		// Check if the function is valid by solving once
 		bool isValid();
 		// Constructor
 		Expression();
 		// Constructor that sets expression
-		// e.g. ExpressionUtil::ExpressionFloat expr("x^2/sin(2*pi/y)-x/2");
+		// e.g. ExprUtil::ExpressionFloat expr("x^2/sin(2*pi/y)-x/2");
 		Expression(std::string expression);
 	};
 
 	// Instantiation
-	typedef Expression<float> ExpressionFloat;
-	typedef Expression<double> ExpressionDouble;
+	typedef Expression<float> ExprFloat;
+	typedef Expression<double> ExprDouble;
 }
 
 #endif
