@@ -5,7 +5,7 @@ Work in progress 3D function graphing tool.
 
 ## Getting Started
 ### Dependencies
-Requires OpenGL, [GLFW](https://www.glfw.org/), [GLAD](https://glad.dav1d.de/)\*, [GLM](https://glm.g-truc.net/0.9.9/index.html), and [ExpressionUtil](https://github.com/cxcd/Expression-Utility)\*.
+Requires OpenGL, [GLFW](https://www.glfw.org/), [GLAD](https://glad.dav1d.de/)\*, [GLM](https://glm.g-truc.net/0.9.9/index.html), and [Expression Utility](https://github.com/cxcd/Expression-Utility)\*.
 
 \*included
 
